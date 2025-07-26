@@ -1,3 +1,4 @@
+import { upsertStreamUser } from "../lib/stream.js";
 import { User } from "../models/User.js";
 import jwt from "jsonwebtoken";
 
@@ -37,6 +38,17 @@ export const signup = async (req, res) => {
       profilePic: randomAvatar,
     });
 
+    try {
+      await upsertStreamUser({
+        id: newUser._id.toString(),
+        name: newUser.fullname,
+        image: newUser.profilePic || "",
+      });
+      console.log(`Stream user created for ${newUser.fullname}`);
+    } catch (error) {
+      console.log("Error creating Stream user: ", error);
+    }
+
     const token = jwt.sign(
       { userId: newUser._id },
       process.env.JWT_SECRET_KEY,
@@ -58,9 +70,42 @@ export const signup = async (req, res) => {
 };
 
 export const login = async (req, res) => {
-  res.send("Sign In");
+  try {
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+      return res.status(400).json({ message: "All fields are required!" });
+    }
+
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(401).json({ message: "Invalid email or password!" });
+    }
+
+    const isPasswordCorrect = await user.matchPassword(password);
+    if (!isPasswordCorrect) {
+      return res.status(401).json({ message: "Invalid email or password!" });
+    }
+
+    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET_KEY, {
+      expiresIn: "24h",
+    });
+
+    res.cookie("jwt", token, {
+      maxAge: 24 * 60 * 60 * 1000,
+      httpOnly: true, // prevent XSS attacks
+      sameSite: "strict", // prevent CSRF attacks
+      secure: process.env.NODE_ENV === "production",
+    });
+
+    res.status(200).json({ success: true, user });
+  } catch (error) {
+    console.log("Error in login controller: ", error.message);
+    res.status(500).json({ message: "Server Error" });
+  }
 };
 
 export const logout = async (req, res) => {
-  res.send("Sign Out");
+  res.clearCookie("jwt");
+  res.status(200).json({ success: true, message: "Logout successful!" });
 };
