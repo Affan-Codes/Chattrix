@@ -14,10 +14,21 @@ const PORT = process.env.PORT;
 
 const app = express();
 
+const allowedOrigins = [
+  "http://localhost:5173",
+  "https://rabbit-alpha.vercel.app",
+];
+
 app.use(
   cors({
-    origin: "http://localhost:5173",
-    credentials: true, // allow frontend to send cookies
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    credentials: true,
   })
 );
 app.use(express.json());
@@ -28,6 +39,8 @@ app.use("/api/auth", authRoutes);
 app.use("/api/users", usersRoutes);
 app.use("/api/chat", chatRoutes);
 
-app.listen(PORT, () => {
-  console.log(`Server running on port http://localhost:${PORT}`);
-});
+// app.listen(PORT, () => {
+//   console.log(`Server running on port http://localhost:${PORT}`);
+// });
+
+export default app;
