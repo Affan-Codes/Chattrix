@@ -16,7 +16,7 @@ const app = express();
 
 const allowedOrigins = [
   "http://localhost:5173",
-  "https://chattrix-alpha.vercel.app/",
+  "https://chattrix-alpha.vercel.app",
 ];
 
 app.use(
