@@ -1,15 +1,9 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import useAuthUser from "../hooks/useAuthUser";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 import { completeOnboarding } from "../lib/api";
-import {
-  CameraIcon,
-  LoaderIcon,
-  MapPinIcon,
-  ShipWheelIcon,
-  ShuffleIcon,
-} from "lucide-react";
+import { CameraIcon, LoaderIcon, MapPinIcon, ShuffleIcon } from "lucide-react";
 import { LANGUAGES } from "../constants";
 
 const OnboardingPage = () => {
@@ -201,7 +195,7 @@ const OnboardingPage = () => {
             >
               {!isPending ? (
                 <>
-                  <ShipWheelIcon className="size-5 mr-2" />
+                  <img className="size-12" src="/logo.png" />
                   Complete Onboarding
                 </>
               ) : (
