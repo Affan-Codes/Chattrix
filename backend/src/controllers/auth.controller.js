@@ -58,7 +58,7 @@ export const signup = async (req, res) => {
     res.cookie("jwt", token, {
       maxAge: 24 * 60 * 60 * 1000,
       httpOnly: true, // prevent XSS attacks
-      sameSite: "none", // prevent CSRF attacks
+      sameSite: "none", // prevent CSRF attacks if "strict"
       secure: process.env.NODE_ENV === "production",
     });
 
@@ -94,7 +94,7 @@ export const login = async (req, res) => {
     res.cookie("jwt", token, {
       maxAge: 24 * 60 * 60 * 1000,
       httpOnly: true, // prevent XSS attacks
-      sameSite: "strict", // prevent CSRF attacks
+      sameSite: "none", // prevent CSRF attacks if "strict"
       secure: process.env.NODE_ENV === "production",
     });
 
